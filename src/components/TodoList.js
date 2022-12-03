@@ -1,10 +1,16 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { toggle } from '../redux/todos/todosSlice';
+import { destroy, toggle } from '../redux/todos/todosSlice';
 
 function TodoList() {
     const dispatch = useDispatch()
     const items = useSelector((state) => state.todos.items)
+
+    const handleDestroy = (id) => {
+        if(window.confirm('Are you sure?')) {
+            dispatch(destroy(id))
+        }
+    }
 
     console.log(items);
     return (
@@ -21,7 +27,10 @@ function TodoList() {
                                     onChange={() => dispatch(toggle({ id: item.id }))}
                                 />
                                 <label>{item.title}</label>
-                                <button className="destroy"></button>
+                                <button
+                                    className="destroy"
+                                    onClick={() => handleDestroy(item.id)}
+                                ></button>
                             </div>
                         </li>
                     ))
