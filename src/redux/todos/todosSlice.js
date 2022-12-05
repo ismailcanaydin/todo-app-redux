@@ -3,17 +3,19 @@ import { createSlice } from "@reduxjs/toolkit";
 export const todosSlice = createSlice({
     name: 'todos',
     initialState: {
-        items: [{
-            id: '1',
-            title: 'Learn React',
-            completed: true
-        },
-        {
-            id: '2',
-            title: 'Read a book',
-            completed: false
-        }
+        items: [
+            // {
+            //     id: '1',
+            //     title: 'Learn React',
+            //     completed: true
+            // },
+            // {
+            //     id: '2',
+            //     title: 'Read a book',
+            //     completed: false
+            // }
         ],
+        activeFilter: 'all'
     },
     //createSlice data klanlamayı kendi yapıyor.
     //Buranın dışında işlem yapılacağı zaman datayı klanlamamız gerekli.
@@ -30,9 +32,16 @@ export const todosSlice = createSlice({
             const id = action.payload
             const filtered = state.items.filter((item) => item.id !== id)
             state.items = filtered
+        },
+        changeActiveFilter: (state, action) => {
+            state.activeFilter = action.payload
+        },
+        clearCompleted: (state) => {
+            const filtered = state.items.filter((item) => item.completed === false)
+            state.items = filtered
         }
     },
 })
 
-export const { addTodo, toggle, destroy } = todosSlice.actions
+export const { addTodo, toggle, destroy, changeActiveFilter, clearCompleted } = todosSlice.actions
 export default todosSlice.reducer
