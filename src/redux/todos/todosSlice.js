@@ -1,4 +1,10 @@
-import { createSlice, nanoid } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
+import { wait } from "@testing-library/user-event/dist/utils";
+
+export const getTodosAsync = createAsyncThunk('todos/getTodosAsync', async () => {
+    const res = await fetch('http://localhost:7000/todos')
+    return await res.json()
+})
 
 export const todosSlice = createSlice({
     name: 'todos',
@@ -15,6 +21,8 @@ export const todosSlice = createSlice({
             //     completed: false
             // }
         ],
+        isLoading: false,
+        error: null,
         activeFilter: 'all'
     },
     //createSlice data klanlamayı kendi yapıyor.
@@ -24,7 +32,7 @@ export const todosSlice = createSlice({
             reducer: (state, action) => {
                 state.items.push(action.payload)
             },
-            prepare: ({title}) => {
+            prepare: ({ title }) => {
                 return {
                     payload: {
                         id: nanoid(),
@@ -52,6 +60,19 @@ export const todosSlice = createSlice({
             state.items = filtered
         }
     },
+    extraReducers: {
+        [getTodosAsync.pending]: (state, action) => {
+            state.isLoading = true
+        },
+        [getTodosAsync.fulfilled]: (state, action) => {
+            state.items = action.payload
+            state.isLoading = false
+        },
+        [getTodosAsync.rejected]: (state, action) => {
+            state.error = action.error.message
+            state.isLoading = false
+        }
+    }
 })
 
 export const selectTodos = (state) => state.todos.items
