@@ -11,6 +11,16 @@ export const addTodoAsync = createAsyncThunk('todos/addTodoAsync', async (data) 
     return res.data
 })
 
+export const toggleTodoAsync = createAsyncThunk('todos/toggleTodoAsync', async ({ id, data }) => {
+    const res = await axios.patch(`${process.env.REACT_APP_API_BASE_ENDPOINT}/todos/${id}`, data)
+    return res.data
+})
+
+export const removeTodoAsync = createAsyncThunk('todos/removeTodoAsync', async (id) => {
+    const res = await axios.delete(`${process.env.REACT_APP_API_BASE_ENDPOINT}/todos/${id}`)
+    return res.data
+})
+
 export const todosSlice = createSlice({
     name: 'todos',
     initialState: {
@@ -49,16 +59,16 @@ export const todosSlice = createSlice({
         //         }
         //     },
         // },
-        toggle: (state, action) => {
-            const { id } = action.payload
-            const item = state.items.find((item) => item.id === id)
-            item.completed = !item.completed
-        },
-        destroy: (state, action) => {
-            const id = action.payload
-            const filtered = state.items.filter((item) => item.id !== id)
-            state.items = filtered
-        },
+        // toggle: (state, action) => {
+        //     const { id } = action.payload
+        //     const item = state.items.find((item) => item.id === id)
+        //     item.completed = !item.completed
+        // },
+        // destroy: (state, action) => {
+        //     const id = action.payload
+        //     const filtered = state.items.filter((item) => item.id !== id)
+        //     state.items = filtered
+        // },
         changeActiveFilter: (state, action) => {
             state.activeFilter = action.payload
         },
@@ -92,6 +102,18 @@ export const todosSlice = createSlice({
             state.error = action.error.message
             state.addNewTodoIsLoading = false
         },
+        // toggle todo
+        [toggleTodoAsync.fulfilled]: (state, action) => {
+            const { id, completed } = action.payload
+            const index = state.items.findIndex(item => item.id === id)
+            state.items[index].completed = completed
+        },
+        // remove todo
+        [removeTodoAsync.fulfilled]: (state, action) => {
+            const id = action.payload
+            const index = state.items.findIndex((item) => item.id === id)
+            state.items.splice(index, 1)
+        }
     }
 })
 
