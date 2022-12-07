@@ -1,9 +1,14 @@
 import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
-import { wait } from "@testing-library/user-event/dist/utils";
+import axios from "axios";
 
 export const getTodosAsync = createAsyncThunk('todos/getTodosAsync', async () => {
-    const res = await fetch('http://localhost:7000/todos')
+    const res = await fetch(`${process.env.REACT_APP_API_BASE_ENDPOINT}/todos`)
     return await res.json()
+})
+
+export const addTodoAsync = createAsyncThunk('todos/addTodoAsync', async (data) => {
+    const res = await axios.post(`${process.env.REACT_APP_API_BASE_ENDPOINT}/todos`, data)
+    return res.data
 })
 
 export const todosSlice = createSlice({
@@ -23,25 +28,27 @@ export const todosSlice = createSlice({
         ],
         isLoading: false,
         error: null,
-        activeFilter: 'all'
+        activeFilter: 'all',
+        addNewTodoIsLoading: false,
+        addNewTodoError: null,
     },
     //createSlice data klanlamayı kendi yapıyor.
     //Buranın dışında işlem yapılacağı zaman datayı klanlamamız gerekli.
     reducers: {
-        addTodo: {
-            reducer: (state, action) => {
-                state.items.push(action.payload)
-            },
-            prepare: ({ title }) => {
-                return {
-                    payload: {
-                        id: nanoid(),
-                        completed: false,
-                        title,
-                    },
-                }
-            },
-        },
+        // addTodo: {
+        //     reducer: (state, action) => {
+        //         state.items.push(action.payload)
+        //     },
+        //     prepare: ({ title }) => {
+        //         return {
+        //             payload: {
+        //                 id: nanoid(),
+        //                 completed: false,
+        //                 title,
+        //             },
+        //         }
+        //     },
+        // },
         toggle: (state, action) => {
             const { id } = action.payload
             const item = state.items.find((item) => item.id === id)
@@ -61,6 +68,7 @@ export const todosSlice = createSlice({
         }
     },
     extraReducers: {
+        // get todos
         [getTodosAsync.pending]: (state, action) => {
             state.isLoading = true
         },
@@ -71,7 +79,19 @@ export const todosSlice = createSlice({
         [getTodosAsync.rejected]: (state, action) => {
             state.error = action.error.message
             state.isLoading = false
-        }
+        },
+        // add todo
+        [addTodoAsync.pending]: (state, action) => {
+            state.addNewTodoIsLoading = true
+        },
+        [addTodoAsync.fulfilled]: (state, action) => {
+            state.items.push(action.payload)
+            state.addNewTodoIsLoading = false
+        },
+        [addTodoAsync.rejected]: (state, action) => {
+            state.error = action.error.message
+            state.addNewTodoIsLoading = false
+        },
     }
 })
 
