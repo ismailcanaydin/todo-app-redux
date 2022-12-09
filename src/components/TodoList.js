@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { destroy, getTodosAsync, removeTodoAsync, selectActiveFilter, selectFilteredTodos, selectTodos, toggle, toggleTodoAsync } from '../redux/todos/todosSlice';
+import { destroy, getTodosAsync, removeTodoAsync, selectActiveFilter, selectTodos, toggle, toggleTodoAsync } from '../redux/todos/services';
+import { selectFilteredTodos } from '../redux/todos/todosSlice';
 import Error from './Error';
 import Loading from './Loading';
 
